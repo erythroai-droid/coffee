@@ -35,5 +35,5 @@ Disallow: /
 User-Agent: Applebot-Extended
 Disallow: /
 
-Host: https://origin-coffee.erythro.ai
-Sitemap: https://origin-coffee.erythro.ai/sitemap.xml
+Host: https://origin.erythro.ai
+Sitemap: https://origin.erythro.ai/sitemap.xml

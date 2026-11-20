@@ -24,7 +24,7 @@ export const BRAND = 'ORIGIN';
 export const MODEL = 'Coffee';
 
 /** Production URL: canonical, Open Graph, sitemap. NEXT_PUBLIC_SITE_URL overrides it per Vercel environment. */
-export const SITE_URL = (process.env.NEXT_PUBLIC_SITE_URL || 'https://origin-coffee.erythro.ai').replace(/\/$/, '');
+export const SITE_URL = (process.env.NEXT_PUBLIC_SITE_URL || 'https://origin.erythro.ai').replace(/\/$/, '');
 
 /** Page title / description (also the Open Graph + Twitter card text). */
 export const TITLE = `${BRAND} ${MODEL} — от ягоды до чашки`;
