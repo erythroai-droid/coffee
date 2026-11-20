@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" fill="none">
+  <rect width="32" height="32" rx="7" fill="#140b06"/>
+  <!-- coffee bean -->
+  <ellipse cx="16" cy="16" rx="7.2" ry="10" transform="rotate(32 16 16)" fill="#e3a65f"/>
+  <path d="M12.2 9.6c3.4 2.4 1.2 6.4 3.8 8.6 1.6 1.4 3.6 2.4 3.9 4.6" stroke="#140b06" stroke-width="1.6" stroke-linecap="round"/>
+</svg>

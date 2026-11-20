@@ -1,0 +1,285 @@
+/* =====================================================================
+   ORIGIN Coffee — palette, film scenes, parallax menu & reviews.
+   Loaded after globals.css (app/layout.tsx), so it overrides the EMBER template's charcoal chrome.
+   ===================================================================== */
+:root{
+  --bg:#140b06; --bg-deep:#0c0603; --panel:#1d120b; --stage:#140b06;
+  --fg:#f7ede1; --mute:#bba892; --silver:#8a7562; --gold:#e3a65f; --ember:#d4622a;
+  --cream:#f7efe4; --espresso:#2a170c;
+  --line:rgba(247,237,225,.16); --line2:rgba(247,237,225,.08);
+}
+::selection{background:var(--gold);color:#1c0f07}
+.btn.solid{background:var(--gold);border-color:var(--gold);color:#1c0f07}
+.btn.solid:hover{background:#f0bd7f;border-color:#f0bd7f;color:#1c0f07}
+.hdr.scrolled{background:rgba(20,11,6,.6)}
+.hdr .logo sup{color:var(--gold)}
+
+/* film: espresso shade on the copy side instead of charcoal — the orange bokeh stays warm */
+.film-shade{background:
+  linear-gradient(to right,rgba(20,11,6,.84) 0%,rgba(20,11,6,.5) 30%,rgba(20,11,6,0) 56%),
+  radial-gradient(ellipse 80% 90% at 58% 50%,transparent 58%,rgba(20,11,6,.45) 100%),
+  linear-gradient(to bottom,rgba(20,11,6,.5),transparent 18%,transparent 80%,rgba(20,11,6,.6))}
+[dir=rtl] .film-shade{background:
+  linear-gradient(to left,rgba(20,11,6,.84) 0%,rgba(20,11,6,.5) 30%,rgba(20,11,6,0) 56%),
+  radial-gradient(ellipse 80% 90% at 42% 50%,transparent 58%,rgba(20,11,6,.45) 100%),
+  linear-gradient(to bottom,rgba(20,11,6,.5),transparent 18%,transparent 80%,rgba(20,11,6,.6))}
+.film-grain{opacity:.045}
+
+/* block-by-block scroll (lib/pager.ts): every film scene is exactly one screen, its copy centred */
+.scn{min-height:var(--vh);height:var(--vh);padding-block:12vh;align-items:center}
+.scn-hero{padding-block:14vh 10vh}
+.scn-exp{min-height:var(--vh);height:var(--vh)}
+.scn-ritual .scn-p{margin-block:16px 8px}
+.scn-ritual .scn-steps li{padding-block:10px}
+.scn-stats b{color:var(--gold)}
+.scn-tags span{border-color:rgba(227,166,95,.45);color:#f3d4ad;background:rgba(20,11,6,.35)}
+
+/* brewing steps (ritual scene) */
+.scn-steps{list-style:none;margin-block:22px 32px}
+.scn-steps li{display:grid;grid-template-columns:34px 1fr auto;align-items:baseline;gap:14px;padding-block:13px;border-block-end:1px solid var(--line2)}
+.scn-steps i{font-style:normal;font-size:11px;letter-spacing:.18em;color:var(--gold)}
+.scn-steps .nm{font-family:var(--font-display),serif;font-size:22px;font-weight:500;line-height:1.15}
+.scn-steps .nm small{margin-block-start:4px;font-family:var(--font-main),sans-serif;font-size:12px;letter-spacing:.02em;text-transform:none;color:var(--mute)}
+.scn-steps .wt{font-weight:500;font-size:15px;color:var(--gold);white-space:nowrap}
+/* finale: the cup fills the centre of the frame, so the copy sits in the shaded start column like the other scenes */
+.scn-exp{justify-content:flex-start;align-items:center;text-align:start;padding-block:16vh}
+.scn-exp .scn-in{width:min(560px,100%);align-items:flex-start}
+.exp-h{color:#f6d3a4;font-size:clamp(40px,4.5vw,76px);line-height:1;margin-block:6px 32px}
+.exp-act{justify-content:flex-start}
+
+/* ---------- parallax sections ---------- */
+.plx-sec{position:relative;z-index:2;isolation:isolate;overflow:clip;background:var(--bg);
+  padding:16vh calc(var(--gx) + var(--rail));border-radius:28px 28px 0 0;box-shadow:0 -40px 80px rgba(0,0,0,.55)}
+.plx-stage{position:absolute;inset:0;z-index:0;pointer-events:none;overflow:clip}
+.plx{position:absolute;will-change:transform}
+.plx img{display:block;width:100%;height:auto;max-width:none;user-select:none;
+  transform:translate3d(calc(var(--mx,0) * var(--d) * -30px),calc(var(--my,0) * var(--d) * -20px),0);
+  transition:transform 1.1s var(--ease)}
+.plx-bg{inset:-22% 0}
+.plx-bg img{width:100%;height:100%;object-fit:cover;transform:translate3d(calc(var(--mx,0) * 14px),calc(var(--my,0) * 10px),0) scale(1.06)}
+.plx.blur img{filter:blur(3px)}
+.plx.far img{filter:blur(1.6px) brightness(.85);opacity:.8}
+.plx-veil{position:absolute;inset:0}
+.plx-in{position:relative;z-index:1}
+/* things that fly: a slow drift on top of the scroll depth */
+.m-b1 img,.m-b2 img,.m-b3 img,.r-b1 img,.r-b2 img,.m-split img,.r-berry img{animation:drift 9s ease-in-out infinite}
+.m-b2 img{animation-duration:11s;animation-delay:-3s}
+.m-b3 img,.r-b2 img{animation-duration:13s;animation-delay:-6s}
+.m-split img,.r-berry img{animation-duration:12s}
+@keyframes drift{0%,100%{translate:0 0;rotate:0deg}50%{translate:0 -14px;rotate:8deg}}
+
+.sec-head{max-width:620px;margin-block-end:6vh}
+.sec-head .scn-h{font-size:clamp(46px,5.6vw,92px)}
+
+/* menu: bokeh far back, the swirl on the end side, cards in front */
+.menu-sec{min-height:var(--vh);padding-block:13vh 8vh;display:flex;align-items:center}
+.menu-sec .sec-head{margin-block-end:4vh}
+.menu-sec .mc{padding:20px 22px 16px;gap:9px}
+/* one screen: the title on one line next to the intro, cards a notch tighter */
+@media (min-width:901px){
+  .menu-sec{padding-block:11vh 6vh}
+  .menu-sec .scn-h br{display:none}
+  .menu-sec .scn-h span::before{content:" "}
+  .menu-sec .sec-head .scn-p{margin-block:12px 0}
+  .menu-sec .mc-d{font-size:13.5px;line-height:1.5}
+  .menu-sec .mc-n{font-size:clamp(22px,1.8vw,28px)}
+  .menu-foot-note{margin-block-start:16px}
+}
+/* flush with the section top: the parallax pushes it down by up to d·0.42·vh (≈5vh), so start that far above; overflow:clip trims the rest */
+.m-swirl{inset-inline-end:-3vw;top:calc(var(--vh) * -.06);width:min(44vw,780px)}
+.m-split{inset-inline-start:50%;top:3%;width:min(13vw,240px)}
+.m-b1{inset-inline-start:6%;bottom:9%;width:min(5vw,90px)}
+.m-b2{inset-inline-end:33%;bottom:3%;width:min(8vw,150px)}
+.m-b3{inset-inline-start:41%;top:20%;width:min(3vw,56px)}
+.m-grains{inset-inline-start:50%;bottom:16%;width:min(7vw,130px)}
+.menu-veil{background:
+  linear-gradient(to right,rgba(20,11,6,.93) 0%,rgba(20,11,6,.78) 38%,rgba(20,11,6,.25) 68%,rgba(20,11,6,.05) 100%),
+  linear-gradient(to bottom,rgba(20,11,6,.55),transparent 22%,transparent 80%,rgba(20,11,6,.7))}
+[dir=rtl] .menu-veil{background:
+  linear-gradient(to left,rgba(20,11,6,.93) 0%,rgba(20,11,6,.78) 38%,rgba(20,11,6,.25) 68%,rgba(20,11,6,.05) 100%),
+  linear-gradient(to bottom,rgba(20,11,6,.55),transparent 22%,transparent 80%,rgba(20,11,6,.7))}
+.menu-grid{list-style:none;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:18px;width:min(1040px,62vw)}
+.mc-wrap{height:100%}
+.mc{height:100%;display:flex;flex-direction:column;gap:12px;padding:24px 24px 20px;border-radius:18px;
+  background:rgba(32,18,9,.55);border:1px solid rgba(247,237,225,.12);backdrop-filter:blur(14px) saturate(1.2);-webkit-backdrop-filter:blur(14px) saturate(1.2);
+  box-shadow:0 20px 50px rgba(0,0,0,.35);transition:transform .45s var(--ease),border-color .35s,background .35s}
+.mc:hover{transform:translateY(-6px);border-color:rgba(227,166,95,.6);background:rgba(40,22,11,.66)}
+.mc header{display:flex;justify-content:space-between;align-items:center}
+.mc header i{font-style:normal;font-size:11px;letter-spacing:.2em;color:var(--gold)}
+.mc-tag{font-size:10px;letter-spacing:.16em;text-transform:uppercase;padding:5px 10px;border-radius:30px;border:1px solid var(--line);color:var(--mute)}
+.mc-tag.t-sig{border-color:var(--gold);color:var(--gold)}
+.mc-tag.t-cold{border-color:rgba(160,200,230,.5);color:#bcd8ee}
+.mc-n{margin:4px 0 0;font-family:var(--font-display),serif;font-weight:500;font-size:clamp(24px,2vw,32px);letter-spacing:0;text-transform:none;line-height:1.1}
+.mc-d{flex:1;font-size:14px;line-height:1.6;font-weight:300;color:#dccfbf}
+.mc footer{display:flex;align-items:baseline;gap:12px;padding-block-start:14px;border-block-start:1px solid var(--line2)}
+.mc footer i{flex:1}
+.mc-ml{font-size:12px;letter-spacing:.12em;color:var(--mute)}
+.mc-p{font-family:var(--font-display),serif;font-weight:500;font-size:24px;color:var(--gold)}
+.menu-foot-note{margin-block-start:26px;font-size:12px;letter-spacing:.06em;color:var(--mute)}
+
+/* reviews: the milk crown rises at the bottom, cream cards over it */
+.rev-sec{min-height:var(--vh);padding-block:13vh 8vh;display:flex;align-items:center}
+.rev-sec .plx-in{width:100%}
+.rev-sec .sec-head{margin-block-end:4vh}
+.rev-sec .rc{padding:20px 22px 18px;gap:12px}
+.rev-sec .rc blockquote{font-size:16.5px}
+.r-crown{inset-inline:-4%;bottom:-9%}
+.r-berry{inset-inline-end:7%;top:9%;width:min(12vw,220px)}
+.r-steam{inset-inline-start:46%;top:8%;width:min(22vw,380px);opacity:.55}
+.r-b1{inset-inline-start:30%;top:26%;width:min(5vw,90px)}
+.r-b2{inset-inline-end:28%;top:5%;width:min(3vw,54px)}
+.rev-veil{background:
+  linear-gradient(to bottom,rgba(20,11,6,.92) 0%,rgba(20,11,6,.62) 30%,rgba(20,11,6,.08) 62%,transparent 100%)}
+.rev-head{display:flex;justify-content:space-between;align-items:flex-end;gap:30px;max-width:none}
+.rev-score{text-align:end}
+.rev-score b{display:block;font-family:var(--font-display),serif;font-weight:500;font-size:clamp(56px,6vw,96px);line-height:.9;color:var(--gold)}
+.rev-score .stars{display:block;margin-block:10px 6px;font-size:18px;letter-spacing:.2em;color:var(--gold)}
+.rev-score small{letter-spacing:.2em}
+.rev-grid{list-style:none;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:18px}
+.rc-wrap{height:100%}
+.rc{height:100%;margin:0;display:flex;flex-direction:column;gap:16px;padding:26px 24px 22px;border-radius:18px;
+  background:rgba(247,239,228,.94);color:var(--espresso);box-shadow:0 24px 60px rgba(40,18,6,.35);
+  transition:transform .45s var(--ease),box-shadow .45s var(--ease)}
+.rc:hover{transform:translateY(-6px) rotate(-.6deg);box-shadow:0 34px 70px rgba(40,18,6,.45)}
+.rc .stars{font-size:15px;letter-spacing:.18em;color:#c9782f}
+.rc .stars u{text-decoration:none;color:rgba(42,23,12,.2)}
+.rc blockquote{flex:1;font-family:var(--font-display),serif;font-size:18px;line-height:1.5;font-weight:500}
+.rc figcaption{display:flex;align-items:center;gap:12px;padding-block-start:14px;border-block-start:1px solid rgba(42,23,12,.12)}
+.rc-av{display:block;width:56px;height:56px;border-radius:50%;flex:none;object-fit:cover;background:#e6d6c4;box-shadow:0 0 0 2px var(--cream),0 0 0 3.5px rgba(201,120,47,.55),0 8px 18px rgba(40,18,6,.25)}
+.rc figcaption b{display:block;font-size:14px;font-weight:600}
+.rc figcaption small{margin-block-start:3px;font-size:11px;letter-spacing:.08em;text-transform:none;color:#7a6250}
+html:is([lang=he],[lang=ar]) :is(.rc blockquote,.mc-n,.mc-p,.scn-steps .nm){font-family:inherit}
+
+/* gallery: the wall and the wooden table top (the photo has its own spotlight) — only a soft edge vignette on top */
+.gal-t{background-color:#1a110c;background-position:center;background-size:cover}
+.gal-t::before{background:radial-gradient(ellipse 110% 100% at 50% 60%,transparent 55%,rgba(10,5,2,.6) 100%)}
+.gal-t .tp-print{box-shadow:0 1px 2px rgba(0,0,0,.5),0 18px 34px rgba(0,0,0,.55),0 40px 80px rgba(0,0,0,.5)}
+@media (max-width:900px){.gal-t{background-image:url(/gallery/table-1400.webp)!important}}
+
+/* footer: deep espresso, section links above the big brand mark */
+.ctc{background:var(--bg-deep);border-radius:28px 28px 0 0;box-shadow:0 -40px 80px rgba(0,0,0,.55)}
+/* footer: the barista loop shows through — darker on the copy side and at the very bottom */
+.ctc-veil{background:linear-gradient(90deg,rgba(12,6,3,.9) 0%,rgba(12,6,3,.72) 45%,rgba(12,6,3,.45) 100%),linear-gradient(180deg,rgba(12,6,3,.75) 0%,rgba(12,6,3,.1) 35%,rgba(12,6,3,.25) 65%,rgba(12,6,3,.95) 100%)}
+[dir=rtl] .ctc-veil{background:linear-gradient(-90deg,rgba(12,6,3,.9) 0%,rgba(12,6,3,.72) 45%,rgba(12,6,3,.45) 100%),linear-gradient(180deg,rgba(12,6,3,.75) 0%,rgba(12,6,3,.1) 35%,rgba(12,6,3,.25) 65%,rgba(12,6,3,.95) 100%)}
+.ctc-dl dd,.ctc .scn-p{text-shadow:0 2px 14px rgba(0,0,0,.6)}
+@media (max-width:900px){.ctc-veil,[dir=rtl] .ctc-veil{background:linear-gradient(180deg,rgba(12,6,3,.85),rgba(12,6,3,.7) 40%,rgba(12,6,3,.95))}}
+.ctc-nav{display:flex;flex-wrap:wrap;gap:12px 34px;margin-block-start:9vh;padding-block-start:22px;border-block-start:1px solid var(--line2);
+  font-size:12px;letter-spacing:.2em;text-transform:uppercase;color:var(--mute)}
+.ctc-nav a{transition:color .25s}
+.ctc-nav a:hover{color:var(--gold)}
+.ctc-brand{margin-block-start:8vh}
+
+@media (max-width:1100px){
+  .menu-grid{grid-template-columns:repeat(2,minmax(0,1fr));width:min(760px,70vw)}
+  .rev-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
+}
+@media (max-width:900px){
+  .plx-sec{padding:12vh var(--gx);border-radius:20px 20px 0 0}
+  .sec-head .scn-h{font-size:clamp(38px,11vw,62px)}
+  .menu-grid{grid-template-columns:1fr;width:100%}
+  .m-swirl{inset-inline-end:-22vw;top:-3vh;width:78vw;opacity:.75}
+  .m-split{inset-inline-start:auto;inset-inline-end:4%;top:auto;bottom:4%;width:30vw}
+  .m-b1{width:12vw}
+  .m-b2{width:16vw;inset-inline-end:8%;bottom:30%}
+  .m-b3{width:7vw}
+  .m-grains{width:16vw;bottom:44%;inset-inline-start:70%}
+  .menu-veil,[dir=rtl] .menu-veil{background:linear-gradient(to bottom,rgba(20,11,6,.6),rgba(20,11,6,.82) 30%,rgba(20,11,6,.88))}
+  .rev-head{flex-direction:column;align-items:flex-start}
+  .rev-score{text-align:start}
+  /* reviews: a swipeable row on phones */
+  .rev-grid{display:flex;overflow-x:auto;scroll-snap-type:x mandatory;gap:14px;margin-inline:calc(var(--gx) * -1);padding:4px var(--gx) 18px;scrollbar-width:none}
+  .rev-grid::-webkit-scrollbar{display:none}
+  .rev-grid li{flex:0 0 82%;scroll-snap-align:center}
+  .r-berry{width:26vw;top:4%;inset-inline-end:4%}
+  .r-steam{width:50vw;inset-inline-start:30%}
+  .r-b1{width:12vw;top:20%;inset-inline-start:66%}
+  .r-crown{inset-inline:-40%;bottom:-6%}
+  .ctc{border-radius:20px 20px 0 0}
+  .ctc-nav{gap:12px 22px;font-size:11px}
+}
+
+/* phones: native scroll-driven depth (ScrollSmoother is off there, so the layers can use the page's own view timeline).
+   Decorative only — browsers without scroll-driven animations simply show the layers in place. */
+@keyframes plxY{from{translate:0 calc(var(--d) * 18vh)}to{translate:0 calc(var(--d) * -18vh)}}
+@supports ((animation-timeline: view()) and (animation-range: entry)){
+  @media (prefers-reduced-motion:no-preference){
+    html.static .plx-sec{view-timeline:--plx}
+    html.static .plx{animation:plxY linear both;animation-timeline:--plx}
+  }
+}
+@media (prefers-reduced-motion:reduce){
+  .plx img{animation:none!important;transition:none}
+}
+
+/* short screens: tighter type so a block still fits one screen */
+@media (min-width:901px) and (max-height:820px){
+  .scn-h{font-size:clamp(40px,5vw,80px)}
+  .sec-head .scn-h{font-size:clamp(38px,4.4vw,70px)}
+  .scn-p{margin-block:14px 20px}
+  .mc-d{font-size:13px;line-height:1.5}
+  .rc blockquote{font-size:15px!important}
+}
+
+/* phones (no ScrollSmoother): the same blocks snap natively, one block per swipe, never skipped.
+   A block taller than the screen (the photo table, the footer) still scrolls freely inside. */
+@media (max-width:900px){
+  html.static{scroll-snap-type:y mandatory}
+  html.static main>*{scroll-snap-align:start;scroll-snap-stop:always}
+  .scn{height:auto;min-height:100svh;align-items:flex-end;padding-block:14vh 12vh}
+  .scn-hero{min-height:100svh}
+  .menu-sec,.rev-sec{display:block}
+}
+
+/* no dark band at the bottom of the screen: the CTA bar floats on its own, the film has no bottom shade */
+.studio-bar{background:none}
+.film-shade{background:
+  linear-gradient(to right,rgba(20,11,6,.84) 0%,rgba(20,11,6,.5) 30%,rgba(20,11,6,0) 56%),
+  linear-gradient(to bottom,rgba(20,11,6,.45),transparent 16%)}
+[dir=rtl] .film-shade{background:
+  linear-gradient(to left,rgba(20,11,6,.84) 0%,rgba(20,11,6,.5) 30%,rgba(20,11,6,0) 56%),
+  linear-gradient(to bottom,rgba(20,11,6,.45),transparent 16%)}
+.ctc-veil,[dir=rtl] .ctc-veil{background:linear-gradient(90deg,rgba(12,6,3,.9) 0%,rgba(12,6,3,.72) 45%,rgba(12,6,3,.45) 100%),
+  linear-gradient(180deg,rgba(12,6,3,.75) 0%,rgba(12,6,3,.1) 35%,rgba(12,6,3,.2) 100%)}
+[dir=rtl] .ctc-veil{background:linear-gradient(-90deg,rgba(12,6,3,.9) 0%,rgba(12,6,3,.72) 45%,rgba(12,6,3,.45) 100%),
+  linear-gradient(180deg,rgba(12,6,3,.75) 0%,rgba(12,6,3,.1) 35%,rgba(12,6,3,.2) 100%)}
+
+/* footer: exactly one screen — copy + contacts at the top, links, the brand mark and the fine print at the bottom */
+@media (min-width:901px){
+  .ctc{height:var(--vh);min-height:0;display:flex;flex-direction:column;padding-block:13vh calc(var(--sbar) + 18px)}
+  .ctc .scn-h{font-size:clamp(40px,4.6vw,76px)}
+  .ctc .scn-p{margin-block:14px 22px}
+  .ctc-grid{gap:5vw}
+  .ctc-dl{gap:14px}
+  .ctc-dl dd{font-size:16px}
+  .ctc-nav{margin-block-start:auto;padding-block-start:18px}
+  .ctc-brand{margin-block:3vh 0;font-size:clamp(56px,10.5vw,190px)}
+  .ctc-bot{margin-block-start:3vh;padding-block-start:16px}
+}
+
+/* blocks follow each other edge to edge — no rounded "sheet" or upward shadow sliding over the block above */
+.plx-sec,.gal-t,.ctc,.gal-t + .ctc{border-radius:0!important;box-shadow:none!important}
+
+/* reviews on the gallery table: a layer over the same backdrop, brought in by the gallery timeline (desktop) */
+.gal-rev{position:absolute;inset:0;z-index:3;display:flex;flex-direction:column;justify-content:center;
+  padding:12vh calc(var(--gx) + var(--rail)) calc(var(--sbar) + 6vh);visibility:hidden;opacity:0}
+.gal-rev::before{content:"";position:absolute;inset:0;z-index:-1;background:linear-gradient(180deg,rgba(14,8,4,.72),rgba(14,8,4,.35) 45%,rgba(14,8,4,.55))}
+.gal-rev .sec-head{margin-block-end:4vh}
+.gal-rev .rc{padding:20px 22px 18px;gap:12px}
+.gal-rev .rc blockquote{font-size:16.5px}
+@media (min-width:901px) and (max-height:820px){.gal-rev .rc blockquote{font-size:15px}.gal-rev .scn-h{font-size:clamp(38px,4.4vw,70px)}}
+/* phones / reduced motion: no pin — the reviews follow the photos in flow, on the same table */
+html.static .gal-rev{position:relative;inset:auto;visibility:visible;opacity:1;pointer-events:auto;padding:8vh var(--gx) 10vh}
+html.static .gal-rev::before{display:none}
+
+/* the footer slides up over the pinned gallery (its last pinned screen, components/Scenes.tsx): pulled up by one screen,
+   above the table, with a soft edge so it reads as a sheet coming over. Only where the gallery is pinned (not on phones). */
+html:not(.static) .ctc{margin-block-start:calc(var(--vh) * -1);z-index:5;border-radius:28px 28px 0 0!important;
+  box-shadow:0 -30px 70px rgba(0,0,0,.6)!important}
+
+/* phones: the prints lie on the table from the start (no drop-in) */
+html.static .tp{transform:rotate(var(--mr));opacity:1;transition:none}
+
+/* the gallery slides up over the pinned menu (Menu in components/Coffee.tsx): pulled up by one screen, above the menu,
+   with a soft edge like the footer. Only where the menu is pinned (not on phones / reduced motion). */
+html:not(.static) .gal-t{margin-block-start:calc(var(--vh) * -1);z-index:4;border-radius:28px 28px 0 0!important;
+  box-shadow:0 -30px 70px rgba(0,0,0,.6)!important}
