@@ -177,7 +177,7 @@ html:is([lang=he],[lang=ar]) :is(.rc blockquote,.mc-n,.mc-p,.scn-steps .nm){font
   .plx-sec{padding:12vh var(--gx);border-radius:20px 20px 0 0}
   .sec-head .scn-h{font-size:clamp(38px,11vw,62px)}
   .menu-grid{grid-template-columns:1fr;width:100%}
-  .m-swirl{inset-inline-end:-22vw;top:-3vh;width:78vw;opacity:.75}
+  .m-swirl{inset-inline-end:-34vw;top:-3vh;width:115vw;opacity:.75}
   .m-split{inset-inline-start:auto;inset-inline-end:4%;top:auto;bottom:4%;width:30vw}
   .m-b1{width:12vw}
   .m-b2{width:16vw;inset-inline-end:8%;bottom:30%}
