@@ -21,3 +21,6 @@ node_modules/
 
 # source design assets (PSD-exports, master video) stay local
 /Assets/
+
+.vercel
+.env*
