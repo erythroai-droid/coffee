@@ -56,7 +56,7 @@ LAYERS = {
     'berry-split': ('Slide2/Bean.png', 900),
     'bean': ('Slide2/roasted_bean.png', 360),
     'grains': ('Slide2/grains.png', 420),
-    'swirl': ('Slide7/Elements.png', 1100),
+    'swirl': ('Slide7/Elements_2.png', 1100),
     'crown': ('Slide5/Elements.png', 1920),
     'splash': ('Slide4/Elements.png', 1920),
     'cup': ('Slide9/Cup.png', 1920),

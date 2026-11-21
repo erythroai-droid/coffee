@@ -7,8 +7,8 @@
 // For a client: `npm run frames -- <video> --every 2` (writes all packs, prints the count), set FRAMES, bump FRAMES_VERSION,
 // cut the still tail if the video ends on a static shot (see README), retime SCENES from a contact sheet.
 
-/** Frames per pack (same count in every pack). All 224 native frames of the 24 fps master (Assets/Video_Final.mp4, 9.3 s). */
-export const FRAMES = 224;
+/** Frames per pack (same count in every pack). 224 native frames of the 24 fps master (Assets/Video_Final.mp4, 9.3 s) minus 44–47 (cut by hand, kept in Assets/frames-removed). */
+export const FRAMES = 220;
 
 /** Landscape packs for wide screens, a centre-cropped portrait pack for phones. */
 export const FRAME_DIR = '/frames/assembly';
@@ -18,7 +18,7 @@ export const PORTRAIT_DIR = '/frames/portrait/540';
  * Frames are served with Cache-Control: immutable (next.config.mjs), so a re-extract under the same file names would mix old
  * cached frames with new ones in returning browsers. Bump this on every re-extract — it goes into every frame URL.
  */
-export const FRAMES_VERSION = 'origin-224-v1';
+export const FRAMES_VERSION = 'origin-220-v2';
 
 export const BRAND = 'ORIGIN';
 export const MODEL = 'Coffee';
@@ -36,16 +36,16 @@ export const DESCRIPTION = `${BRAND} ${MODEL}: кофейня полного ц�
  * SCENES.f is the frame the film shows when that section's top reaches the top of the screen at the designed section heights —
  * used for the intro and as documentation; the CSS section heights (.scn-*) are set in proportion to these spans.
  *
- * Story of the master video (contact sheet):  0–40 ripe berry · 24–56 it splits, the bean falls · 56–80 milk splash ·
- * 80–136 milk surface, the jug pours · 136–184 milk & espresso swirl · 184–223 the cup, steam rising.
+ * Story of the master video (contact sheet):  0–40 ripe berry · 24–52 it splits, the bean falls · 52–76 milk splash ·
+ * 76–132 milk surface, the jug pours · 132–180 milk & espresso swirl · 180–219 the cup, steam rising.
  */
 export const LAST_FRAME = FRAMES - 1;
 export const UNIFORM = false;   // block-by-block scroll (lib/pager.ts): the glide time keeps the speed even instead
 export const SCENES = [
   { id: 'top', f: 0 },          // the whole ripe berry
   { id: 'origin', f: 40 },      // the berry split open, the bean between the halves
-  { id: 'milk', f: 70 },        // the milk crown
-  { id: 'ritual', f: 158 },     // the milk-and-espresso swirl
+  { id: 'milk', f: 66 },        // the milk crown
+  { id: 'ritual', f: 154 },     // the milk-and-espresso swirl
   { id: 'cup', f: LAST_FRAME }, // the cup, steam rising
 ] as const;
 

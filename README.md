@@ -2,7 +2,7 @@
 
 Развёрнут из `C:/dev/templates/scroll-film`. Исходники дизайна — `Assets/` (в git не идут).
 
-- Плёнка: все 224 кадра видео 24 fps (`npm run frames -- Assets/Video_Final.mp4 --every 1`), скорость равномерная: кадр — линейная функция прокрутки от начала хиро до финала (`UNIFORM` в `lib/site.ts`).
+- Плёнка: 220 кадров видео 24 fps (224 минус вырезанные вручную 44–47) (`npm run frames -- Assets/Video_Final.mp4 --every 1`), скорость равномерная: кадр — линейная функция прокрутки от начала хиро до финала (`UNIFORM` в `lib/site.ts`).
 - Сцены поверх плёнки: `components/Coffee.tsx` (hero · origin · milk · ritual · cup), затем меню и отзывы с параллаксом, галерея и футер (`components/Scenes.tsx`).
 - Параллакс: десктоп — GSAP ScrollTrigger + наклон от мыши; телефоны — нативный CSS `view-timeline` (`app/coffee.css`).
 - Веб-нарезка ассетов (галерея, PNG-слои, OG): `py -3 scripts/prepare-assets.py`.
