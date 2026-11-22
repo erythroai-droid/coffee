@@ -50,6 +50,7 @@ const trueArabic = localFont({
 // og/twitter images: app/opengraph-image.tsx + app/twitter-image.tsx (generated brand card). For a real client,
 // drop a 1200x630 app/opengraph-image.jpg + twitter-image.jpg (+ .alt.txt) and delete the two .tsx files.
 export const metadata: Metadata = {
+  robots: { index: false, follow: false },
   metadataBase: new URL(SITE_URL),
   title: TITLE,
   description: DESCRIPTION,

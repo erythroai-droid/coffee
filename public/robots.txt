@@ -1,39 +1,5 @@
-# Search and user-triggered fetches: yes. Model training: no (client can opt in).
-User-Agent: *
+# Erythro.ai portfolio demo — closed from search indexing.
+# Allow crawl so bots can read the noindex meta / X-Robots-Tag (Disallow would hide noindex).
+User-agent: *
 Allow: /
 Disallow: /api/
-
-User-Agent: OAI-SearchBot
-Allow: /
-Disallow: /api/
-
-User-Agent: ChatGPT-User
-Allow: /
-Disallow: /api/
-
-User-Agent: Claude-SearchBot
-Allow: /
-Disallow: /api/
-
-User-Agent: Claude-User
-Allow: /
-Disallow: /api/
-
-User-Agent: PerplexityBot
-Allow: /
-Disallow: /api/
-
-User-Agent: GPTBot
-Disallow: /
-
-User-Agent: ClaudeBot
-Disallow: /
-
-User-Agent: Google-Extended
-Disallow: /
-
-User-Agent: Applebot-Extended
-Disallow: /
-
-Host: https://origin.erythro.ai
-Sitemap: https://origin.erythro.ai/sitemap.xml
