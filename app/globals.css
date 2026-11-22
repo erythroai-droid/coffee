@@ -496,7 +496,7 @@ html[lang=he] .exp-h{font-size:clamp(50px,7vw,112px);font-weight:600}
 
 /* ---------- phones: darker film so the copy reads over the steak ---------- */
 @media (max-width:900px){
-  .film-cv{filter:brightness(.72) saturate(.95)}
+  /* the film is darkened inside the canvas draw (components/Film.tsx PHONE_DIM): a CSS filter re-ran on every frame */
   .film-shade,[dir=rtl] .film-shade{background:
     linear-gradient(to bottom,rgba(0,0,0,.62) 0%,rgba(0,0,0,.38) 18%,rgba(8,6,5,.42) 34%,rgba(8,6,5,.82) 52%,rgba(8,6,5,.94) 72%,rgba(8,6,5,.97) 100%)}
   .scn-h{font-size:clamp(38px,11.2vw,62px)}

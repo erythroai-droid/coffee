@@ -43,7 +43,14 @@ const COARSE = Math.ceil(FRAMES / 4);
  */
 const INTRO_F = Math.round(SCENES[1].f * 0.3);   // a gentle start: the berry turns, it does not split yet
 const INTRO_MS = 3200;
-const introEase = (t: number) => (t < 0.5 ? 2 * t * t : 1 - Math.pow(-2 * t + 2, 2) / 2);
+/**
+ * Phones snap one screen per swipe (native scroll-snap, ~0.3 s), which flashed 40–90 frames by in a blink. There the film
+ * follows the scroll at most PHONE_FPS frames per second: a swipe starts the shot and it plays at a watchable speed
+ * (the desktop pager paces its glides the same way, lib/pager.ts FILM_FPS).
+ */
+const PHONE_FPS = 30;
+const PHONE_DIM = 0.28;   // darkens the film on phones; was a CSS filter on the canvas, re-applied on every repaint
+const introEase =(t: number) => (t < 0.5 ? 2 * t * t : 1 - Math.pow(-2 * t + 2, 2) / 2);
 
 /**
  * The fixed film behind the page. The frame follows the sections: when scene i's top is at the top of the screen the film
@@ -59,6 +66,9 @@ export default function Film({ onLoadProgress, onScene }: Props) {
     const reduced = prefersReducedMotion();
     let pack: Pack = pickPack();
     let imgs: (HTMLImageElement | null)[] = [];
+    const phone = window.matchMedia('(max-width: 900px)');
+    let wake = () => {};                                                         // restarts the paint loop, set below
+    let missing = true;                                                          // the screen shows a stand-in frame
     let gen = 0, cssW = 0, cssH = 0, cur = 0, drawn = -1, scene = -1, raf = 0, first = true, last = 0, introAt = 0, painted = false;
     const intro = (now: number) => (reduced || !introAt ? 0 : INTRO_F * introEase(Math.min(1, Math.max(0, (now - introAt) / INTRO_MS))));
 
@@ -74,15 +84,23 @@ export default function Film({ onLoadProgress, onScene }: Props) {
         const fin = () => {
           n++;
           if (g === 1 && n <= COARSE) onLoadProgress?.(Math.round((n / COARSE) * 100));
-          drawn = -1;
+          // repaint only if the screen shows a stand-in for a frame that had not arrived; otherwise the ~200 frames
+          // streaming in on a slow phone connection each forced a full repaint and kept the loop awake
+          if (missing) { drawn = -1; wake(); }
         };
-        im.onload = () => {
+        // decode off the main thread before the frame counts as ready: drawing an undecoded image stalls the scroll
+        const ready = () => {
           if (g === gen) imgs[i] = im;
           if (i === 0 && !introAt) introAt = performance.now() + 250;   // start the intro once the first frame can show
           fin();
         };
+        im.onload = () => { if (im.decode) im.decode().then(ready, ready); else ready(); };
         im.onerror = fin;
-        im.src = pack === 'p' ? portraitPath(i) : landscapePath(pack, i);
+        const src = pack === 'p' ? portraitPath(i) : landscapePath(pack, i);
+        // phones: the first frames (first, last, the intro's) now, the other ~2 MB once the page has loaded, so the film
+        // does not fight the page's own CSS, fonts and scripts for a mobile connection
+        if (k < 4 || !phone.matches || document.readyState === 'complete') im.src = src;
+        else window.addEventListener('load', () => { if (g === gen) im.src = src; }, { once: true });
       });
     };
 
@@ -122,6 +140,7 @@ export default function Film({ onLoadProgress, onScene }: Props) {
       ctx.globalAlpha = 1; ctx.fillStyle = BG; ctx.fillRect(0, 0, cssW, cssH);
       paint(ja, 1);
       feather();
+      if (phone.matches) { ctx.globalAlpha = PHONE_DIM; ctx.fillStyle = '#000'; ctx.fillRect(0, 0, cssW, cssH); }
       if (!painted) {                                                          // first real picture on screen → metrics
         painted = true;
         window.dispatchEvent(new CustomEvent('film-first-frame', { detail: Math.round(performance.now()) }));
@@ -129,7 +148,8 @@ export default function Film({ onLoadProgress, onScene }: Props) {
       ctx.globalAlpha = 1;
     };
     const resize = () => {
-      const dpr = Math.min(window.devicePixelRatio || 1, 2);
+      // phones get 540 px portrait frames: a backing store past 1.5× only costs fill rate, it adds no detail
+      const dpr = Math.min(window.devicePixelRatio || 1, phone.matches ? 1.5 : 2);
       cssW = window.innerWidth; cssH = window.innerHeight;
       canvas.width = Math.round(cssW * dpr); canvas.height = Math.round(cssH * dpr);
       ctx.setTransform(dpr, 0, 0, dpr, 0, 0); ctx.imageSmoothingQuality = 'high';
@@ -175,18 +195,43 @@ export default function Film({ onLoadProgress, onScene }: Props) {
       // time-based easing (~90 ms): the same feel at 30, 60 or 120 Hz and no lag when the browser throttles frames
       const now = performance.now(), dt = last ? Math.min(250, now - last) : 16;
       last = now;
-      cur = first || reduced ? f : cur + (f - cur) * (1 - Math.exp(-dt / 90));
+      if (first || reduced) cur = f;
+      else {
+        let step = (f - cur) * (1 - Math.exp(-dt / 90));
+        if (phone.matches) {
+          // a long jump (menu link, back to top) runs faster, so it does not rewind the whole film at 30 fps
+          const cap = (PHONE_FPS * Math.max(1, Math.abs(f - cur) / 60) * dt) / 1000;
+          step = Math.max(-cap, Math.min(cap, step));
+        }
+        cur += step;
+      }
       first = false;
       if (Math.abs(cur - f) < 0.002) cur = f;
       const key = (Math.round(cur) + 1) * 1000 + Math.round(shiftAt(cur) * 100) * (document.documentElement.dir === 'rtl' ? -1 : 1);
-      if (key !== drawn) { draw(cur); drawn = ok(Math.round(cur)) ? key : -1; }   // keep retrying until the frame arrives
+      // the nearest loaded frame stands in for a missing one; the load handler repaints when frames arrive
+      if (key !== drawn) { draw(cur); drawn = key; missing = !ok(Math.round(cur)); }
+      // nothing moves (scroll settled, the smoother caught up, the frame is on screen, the intro is over): go to sleep
+      // instead of measuring the sections 60 times a second; any input, scroll, resize or a loaded frame wakes it
+      const still = f === lastF && cur === f && key === drawn && introAt > 0 && now > introAt + INTRO_MS;
+      lastF = f;
+      idle = still ? idle + 1 : 0;
+      if (idle > 45) { cancelAnimationFrame(raf); raf = 0; }
     };
+    let idle = 0, lastF = -1;
+    wake = () => { idle = 0; if (!raf) { last = 0; raf = requestAnimationFrame(tick); } };
 
     resize();
     load();
     raf = requestAnimationFrame(tick);
+    const WAKE = ['scroll', 'wheel', 'touchstart', 'touchmove', 'pointerdown', 'keydown', 'resize'] as const;
     window.addEventListener('resize', resize);
-    return () => { cancelAnimationFrame(raf); window.removeEventListener('resize', resize); gen++; };
+    WAKE.forEach((e) => window.addEventListener(e, wake, { passive: true, capture: true }));
+    return () => {
+      cancelAnimationFrame(raf); raf = -1;
+      window.removeEventListener('resize', resize);
+      WAKE.forEach((e) => window.removeEventListener(e, wake, { capture: true }));
+      gen++;
+    };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 

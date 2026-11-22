@@ -119,6 +119,7 @@ export function Gallery() {
                   width={1000}
                   height={Math.round(1000 / g.a)}
                   alt={t(`gal${g.n}`)}
+                  loading="lazy"
                   decoding="async"
                   draggable={false}
                 />

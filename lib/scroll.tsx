@@ -28,7 +28,10 @@ export function SmoothScroll({ children }: { children: ReactNode }) {
   useEffect(() => {
     const isStatic = window.matchMedia(STATIC_QUERY).matches;
     document.documentElement.classList.toggle('static', isStatic);
-    if (isStatic) { setReady(false); return; }            // static page: nothing below is created
+    // static page: nothing below is created. ScrollTrigger is switched off too: once registered it keeps a requestAnimationFrame
+    // loop alive for good (its Safari workaround), which on a phone is a frame of main-thread work 60× a second for nothing
+    if (isStatic) { ScrollTrigger.disable(); setReady(false); return; }
+    ScrollTrigger.enable();
     // one source of truth for "a screen": the same number the ScrollTriggers use (innerHeight). Updated on width change or a big height change,
     // not on the small changes of the phone's address bar, which would make everything jump.
     // --vh only ever grows while the width stays the same, so a screen-high block can never be shorter than the visible area
@@ -71,7 +74,7 @@ export function lockScroll(lock: boolean) {
 }
 
 /** Re-measure all triggers (after the language, and with it the text height, changes). */
-export function refreshScroll() { ScrollTrigger.refresh(); }
+export function refreshScroll() { if (!document.documentElement.classList.contains('static')) ScrollTrigger.refresh(); }
 
 /** Glide to the section that contains `hash` (menu and search links). */
 export function goToSection(hash: string) {

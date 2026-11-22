@@ -32,6 +32,7 @@ import { I18nProvider } from '@/lib/i18n';
 import { BRAND, DESCRIPTION, MODEL, SITE_URL, TITLE } from '@/lib/site';
 import { MetaPixel } from '@/components/MetaPixel';
 import { GoogleAnalytics } from '@/components/GoogleAnalytics';
+import { DEMO } from '@/lib/demo';
 
 // Arabic (+ paired Latin): True Arabic
 const trueArabic = localFont({
@@ -69,8 +70,9 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html lang="en" dir="ltr" className={trueArabic.variable} suppressHydrationWarning>
       <head>
-        {/* decide the static (no-animation) layout before first paint, so phones never flash the animated one */}
-        <script dangerouslySetInnerHTML={{ __html: "document.documentElement.classList.toggle('static',matchMedia('(max-width: 900px), (prefers-reduced-motion: reduce)').matches)" }} />
+        {/* decide the static (no-animation) layout before first paint, so phones never flash the animated one; the studio
+            frame's room (has-studio, StudioBar) too, so the hero copy does not jump after hydration (layout shift, CLS) */}
+        <script dangerouslySetInnerHTML={{ __html: "document.documentElement.classList.toggle('static',matchMedia('(max-width: 900px), (prefers-reduced-motion: reduce)').matches)" + (DEMO.enabled ? ";document.documentElement.classList.add('has-studio')" : '') }} />
       </head>
       <body>
         <I18nProvider>{children}</I18nProvider>
