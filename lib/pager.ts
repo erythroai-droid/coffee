@@ -18,7 +18,7 @@ import { SCENES } from './site';
  */
 const FILM_FPS = 34;          // film playback speed during a glide, frames per second
 const BASE = 0.85;           // glide time between ordinary blocks, s
-const QUIET = 220;            // ms of wheel silence after a glide before the next notch counts (trackpad inertia)
+const QUIET = 200;            // ms of wheel silence that starts a new gesture (shorter gaps are the same swipe's inertia)
 const WHEEL_MIN = 12;         // ignore tiny wheel jitter
 
 type Stop = { y: number; f: number | null };
@@ -59,14 +59,15 @@ export function usePager(ready: boolean) {
     };
 
     let tw: gsap.core.Tween | null = null;
-    let busy = false, lastWheel = 0, endAt = 0;
+    let busy = false, used = false, lastWheel = 0, aim = 0, startAt = 0;
 
     const blocked = (target: EventTarget | null) =>
       sm.paused() || !!document.querySelector('.lbx, .modal.open') ||
       (target instanceof Element && !!target.closest('.ai, .lang-menu'));
 
-    const go = (dir: 1 | -1) => {
-      const pts = stops(), y = window.scrollY;
+    // `at`: the position the next stop is counted from — the glide's own target when a new gesture comes in mid-glide
+    const go = (dir: 1 | -1, at = window.scrollY) => {
+      const pts = stops(), y = at, y0 = window.scrollY;
       let i = -1;
       if (dir > 0) i = pts.findIndex((p) => p.y > y + 4);
       else for (let k = pts.length - 1; k >= 0; k--) if (pts[k].y < y - 4) { i = k; break; }
@@ -75,16 +76,16 @@ export function usePager(ready: boolean) {
       const from = dir > 0 ? [...pts].reverse().find((p) => p.y <= y + 4) : pts.find((p) => p.y >= y - 4);
       const to = pts[i];
       const frames = from?.f != null && to.f != null ? Math.abs(to.f - from.f) : 0;
-      const dist = Math.abs(to.y - y) / vh();
+      const dist = Math.abs(to.y - y0) / vh();
       const duration = frames ? Math.max(BASE, frames / FILM_FPS) : Math.min(1.3, Math.max(0.6, BASE * Math.max(0.6, dist)));
-      const pos = { y };
-      busy = true;
+      const pos = { y: y0 };
+      busy = true; aim = to.y; startAt = performance.now();
       tw?.kill();
       tw = gsap.to(pos, {
         // power2, not power3: power3's last third is barely movement, and the block seemed to hang at the end of every glide
         y: to.y, duration, ease: frames ? 'sine.inOut' : 'power2.inOut',
         onUpdate: () => window.scrollTo(0, pos.y),
-        onComplete: () => { busy = false; tw = null; endAt = performance.now(); },
+        onComplete: () => { busy = false; tw = null; },
       });
     };
 
@@ -93,10 +94,16 @@ export function usePager(ready: boolean) {
       e.preventDefault();                                   // the page never free-scrolls: one gesture = one step
       const now = performance.now(), quietFor = now - lastWheel;
       lastWheel = now;
-      if (busy) return;
-      if (now - endAt < 600 && quietFor < QUIET) return;    // inertia tail of the previous swipe
-      if (Math.abs(e.deltaY) < WHEEL_MIN) return;
-      go(e.deltaY > 0 ? 1 : -1);
+      // one gesture = one step: a gesture starts after a pause in the wheel stream, and the rest of it (trackpad inertia, a fast
+      // spin of the wheel) is swallowed however long it runs, so a swipe never moves two blocks
+      if (quietFor >= QUIET) used = false;
+      if (used || Math.abs(e.deltaY) < WHEEL_MIN) return;
+      used = true;
+      const dir = e.deltaY > 0 ? 1 : -1;
+      if (!busy) { go(dir); return; }
+      // a new notch while a long film glide is still running (milk → swirl takes 2.6 s): take it at once and carry on to the
+      // following block, instead of swallowing it and making people scroll twice
+      if (now - startAt > 250) go(dir, dir === Math.sign(aim - window.scrollY) ? aim : window.scrollY);
     };
 
     const onKey = (e: KeyboardEvent) => {
