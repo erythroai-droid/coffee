@@ -200,7 +200,12 @@ export default function Film({ onLoadProgress, onScene }: Props) {
         let step = (f - cur) * (1 - Math.exp(-dt / 90));
         if (phone.matches) {
           // a long jump (menu link, back to top) runs faster, so it does not rewind the whole film at 30 fps
-          const cap = (PHONE_FPS * Math.max(1, Math.abs(f - cur) / 60) * dt) / 1000;
+          // and once the menu block starts sliding over the film, the shot is played out fast, so the cup is on screen
+          // before the film is covered instead of the swirl being cut off mid-way
+          const menu = document.getElementById('menu')?.getBoundingClientRect().top ?? Infinity;
+          // (on the last scene the film already hurries a bit: it is the screen people swipe past soonest)
+          const rush = menu < window.innerHeight ? 5 : i === SCENES.length - 1 ? 2 : 1;
+          const cap = (PHONE_FPS * rush * Math.max(1, Math.abs(f - cur) / 60) * dt) / 1000;
           step = Math.max(-cap, Math.min(cap, step));
         }
         cur += step;

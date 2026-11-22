@@ -16,6 +16,8 @@ export const useStaticMode = () => useSyncExternalStore(subscribeStatic, () => w
 
 export const prefersReducedMotion = () => typeof window !== 'undefined' && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
+let stDisabled = false;   // ScrollTrigger switched off for the static (phone) page
+
 // Children create their ScrollTriggers only after the smoother exists (GSAP requires that order).
 const Ready = createContext(false);
 export const useScrollReady = () => useContext(Ready);
@@ -30,8 +32,10 @@ export function SmoothScroll({ children }: { children: ReactNode }) {
     document.documentElement.classList.toggle('static', isStatic);
     // static page: nothing below is created. ScrollTrigger is switched off too: once registered it keeps a requestAnimationFrame
     // loop alive for good (its Safari workaround), which on a phone is a frame of main-thread work 60× a second for nothing
-    if (isStatic) { ScrollTrigger.disable(); setReady(false); return; }
-    ScrollTrigger.enable();
+    if (isStatic) { ScrollTrigger.disable(); stDisabled = true; setReady(false); return; }
+    // only undo our own disable(): enable() on a running ScrollTrigger starts it a second time (a second rAF loop, a second
+    // 250 ms sync timer, doubled refresh handlers) — that slowed the desktop page
+    if (stDisabled) { ScrollTrigger.enable(); stDisabled = false; }
     // one source of truth for "a screen": the same number the ScrollTriggers use (innerHeight). Updated on width change or a big height change,
     // not on the small changes of the phone's address bar, which would make everything jump.
     // --vh only ever grows while the width stays the same, so a screen-high block can never be shorter than the visible area
