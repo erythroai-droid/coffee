@@ -69,7 +69,7 @@ export default function Film({ onLoadProgress, onScene }: Props) {
     const phone = window.matchMedia('(max-width: 900px)');
     let wake = () => {};                                                         // restarts the paint loop, set below
     let missing = true;                                                          // the screen shows a stand-in frame
-    let gen = 0, cssW = 0, cssH = 0, cur = 0, drawn = -1, scene = -1, raf = 0, first = true, last = 0, introAt = 0, painted = false, rushFrom = -1;
+    let gen = 0, cssW = 0, cssH = 0, cur = 0, drawn = -1, scene = -1, raf = 0, first = true, last = 0, introAt = 0, painted = false, rushFrom = -1, jump = false, jumpY = -1, jumpAt = 0;
     const intro = (now: number) => (reduced || !introAt ? 0 : INTRO_F * introEase(Math.min(1, Math.max(0, (now - introAt) / INTRO_MS))));
 
     const load = () => {
@@ -206,7 +206,11 @@ export default function Film({ onLoadProgress, onScene }: Props) {
           // (on the last scene the film already hurries a bit: it is the screen people swipe past soonest)
           const rush = menu < window.innerHeight ? 5 : i === SCENES.length - 1 ? 2 : 1;
           const cap = (PHONE_FPS * rush * Math.max(1, Math.abs(f - cur) / 60) * dt) / 1000;
-          step = Math.max(-cap, Math.min(cap, step));
+          // a jump by a button or a menu link ("to top", a section link) follows the scroll closely instead: the page glides
+          // there in about a second, and a 30 fps film went on rewinding for five more seconds after it had arrived
+          if (!jump) step = Math.max(-cap, Math.min(cap, step));
+          else if (cur === f && scrollY === jumpY && now > jumpAt + 200) jump = false;   // arrived and the scroll has stopped
+          jumpY = scrollY;
           // and a hard floor tied to the menu's slide: whatever the pacing, the film is on its last frame by the time the menu
           // covers half the screen; it moves with the finger, so a fast swipe never leaves the swirl cut off under the menu
           if (menu < window.innerHeight && f === LAST_FRAME && step >= 0) {
@@ -230,6 +234,8 @@ export default function Film({ onLoadProgress, onScene }: Props) {
       if (idle > 45) { cancelAnimationFrame(raf); raf = 0; }
     };
     let idle = 0, lastF = -1;
+    const onJump = () => { jump = true; jumpY = -1; jumpAt = performance.now(); wake(); };
+    window.addEventListener('film:jump', onJump);
     wake = () => { idle = 0; if (!raf) { last = 0; raf = requestAnimationFrame(tick); } };
 
     resize();
@@ -240,6 +246,7 @@ export default function Film({ onLoadProgress, onScene }: Props) {
     WAKE.forEach((e) => window.addEventListener(e, wake, { passive: true, capture: true }));
     return () => {
       cancelAnimationFrame(raf); raf = -1;
+      window.removeEventListener('film:jump', onJump);
       window.removeEventListener('resize', resize);
       WAKE.forEach((e) => window.removeEventListener(e, wake, { capture: true }));
       gen++;

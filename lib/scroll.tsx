@@ -86,6 +86,7 @@ export function refreshScroll() { if (!document.documentElement.classList.contai
 export function goToSection(hash: string) {
   const sm = ScrollSmoother.get();
   if (!sm) {                                              // static page: native smooth scroll
+    window.dispatchEvent(new Event('film:jump'));         // the film follows the jump instead of pacing through it (Film.tsx)
     if (hash === '#top') window.scrollTo({ top: 0, behavior: 'smooth' });
     else document.querySelector(hash)?.scrollIntoView({ behavior: 'smooth' });
     return;
