@@ -69,7 +69,7 @@ export default function Film({ onLoadProgress, onScene }: Props) {
     const phone = window.matchMedia('(max-width: 900px)');
     let wake = () => {};                                                         // restarts the paint loop, set below
     let missing = true;                                                          // the screen shows a stand-in frame
-    let gen = 0, cssW = 0, cssH = 0, cur = 0, drawn = -1, scene = -1, raf = 0, first = true, last = 0, introAt = 0, painted = false;
+    let gen = 0, cssW = 0, cssH = 0, cur = 0, drawn = -1, scene = -1, raf = 0, first = true, last = 0, introAt = 0, painted = false, rushFrom = -1;
     const intro = (now: number) => (reduced || !introAt ? 0 : INTRO_F * introEase(Math.min(1, Math.max(0, (now - introAt) / INTRO_MS))));
 
     const load = () => {
@@ -207,6 +207,13 @@ export default function Film({ onLoadProgress, onScene }: Props) {
           const rush = menu < window.innerHeight ? 5 : i === SCENES.length - 1 ? 2 : 1;
           const cap = (PHONE_FPS * rush * Math.max(1, Math.abs(f - cur) / 60) * dt) / 1000;
           step = Math.max(-cap, Math.min(cap, step));
+          // and a hard floor tied to the menu's slide: whatever the pacing, the film is on its last frame by the time the menu
+          // covers half the screen; it moves with the finger, so a fast swipe never leaves the swirl cut off under the menu
+          if (menu < window.innerHeight && f === LAST_FRAME && step >= 0) {
+            if (rushFrom < 0) rushFrom = cur;
+            const p = Math.max(0, Math.min(1, (1 - menu / window.innerHeight) / 0.5));
+            step = Math.max(step, rushFrom + (LAST_FRAME - rushFrom) * p - cur);
+          } else if (menu >= window.innerHeight) rushFrom = -1;
         }
         cur += step;
       }
