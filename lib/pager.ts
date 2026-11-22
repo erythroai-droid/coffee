@@ -17,7 +17,7 @@ import { SCENES } from './site';
  * Phones / reduced motion run without ScrollSmoother; there the same blocks snap with native CSS scroll snapping (coffee.css).
  */
 const FILM_FPS = 34;          // film playback speed during a glide, frames per second
-const BASE = 1.05;            // glide time between ordinary blocks, s
+const BASE = 0.85;           // glide time between ordinary blocks, s
 const QUIET = 220;            // ms of wheel silence after a glide before the next notch counts (trackpad inertia)
 const WHEEL_MIN = 12;         // ignore tiny wheel jitter
 
@@ -76,12 +76,13 @@ export function usePager(ready: boolean) {
       const to = pts[i];
       const frames = from?.f != null && to.f != null ? Math.abs(to.f - from.f) : 0;
       const dist = Math.abs(to.y - y) / vh();
-      const duration = frames ? Math.max(BASE, frames / FILM_FPS) : Math.min(1.6, Math.max(0.7, BASE * Math.max(0.6, dist)));
+      const duration = frames ? Math.max(BASE, frames / FILM_FPS) : Math.min(1.3, Math.max(0.6, BASE * Math.max(0.6, dist)));
       const pos = { y };
       busy = true;
       tw?.kill();
       tw = gsap.to(pos, {
-        y: to.y, duration, ease: frames ? 'sine.inOut' : 'power3.inOut',
+        // power2, not power3: power3's last third is barely movement, and the block seemed to hang at the end of every glide
+        y: to.y, duration, ease: frames ? 'sine.inOut' : 'power2.inOut',
         onUpdate: () => window.scrollTo(0, pos.y),
         onComplete: () => { busy = false; tw = null; endAt = performance.now(); },
       });

@@ -54,7 +54,9 @@ export function SmoothScroll({ children }: { children: ReactNode }) {
     const sm = ScrollSmoother.create({
       wrapper: '#smooth-wrapper',
       content: '#smooth-content',
-      smooth: prefersReducedMotion() ? 0 : 0.7,   // seconds the content takes to catch up with the native scroll
+      // seconds the content takes to catch up with the native scroll. Short: the pager already eases every glide, and a longer
+      // catch-up only adds a slow crawl at the end of it (the block seemed to linger before it settled)
+      smooth: prefersReducedMotion() ? 0 : 0.2,
       effects: false,
     });
     setReady(true);
