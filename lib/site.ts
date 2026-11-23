@@ -27,8 +27,9 @@ export const MODEL = 'Coffee';
 export const SITE_URL = (process.env.NEXT_PUBLIC_SITE_URL || 'https://origin.erythro.ai').replace(/\/$/, '');
 
 /** Page title / description (also the Open Graph + Twitter card text). */
-export const TITLE = `${BRAND} ${MODEL} — от ягоды до чашки`;
-export const DESCRIPTION = `${BRAND} ${MODEL}: кофейня полного цикла — от спелой ягоды и обжарки до вашей чашки. Меню, галерея, отзывы и бронь.`;
+// English, like <html lang="en"> and og:locale en_US; the wording reuses i18n/en.txt (tagline, top_p, *_nav, c_title).
+export const TITLE = `${BRAND} ${MODEL} — from berry to cup`;
+export const DESCRIPTION = `${BRAND} ${MODEL}: full-cycle coffee house — from ripe berries and small-batch roasting to your cup. Menu, gallery, reviews and table booking.`;
 
 /**
  * Uniform film speed: the frame is a straight function of the scroll distance from the hero top to the finale top, so every
